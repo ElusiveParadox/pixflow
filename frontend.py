@@ -7,7 +7,6 @@ import os
 
 # ------- Backend Import ---------
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
-st.write("Using backend:", BACKEND_URL)
 
 
 # ---------- Page Config ----------
