@@ -20,6 +20,7 @@ if not DATABASE_URL:
 class Base(DeclarativeBase):
     pass
 
+
 class User(SQLAlchemyBaseUserTableUUID, Base):
     posts = relationship(argument="Post", back_populates="user")
 
@@ -48,6 +49,7 @@ async def create_db_and_tables():
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
+
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, User)
