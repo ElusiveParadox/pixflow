@@ -92,15 +92,14 @@ async def get_feed(
     session: AsyncSession = Depends(get_async_session),
     user: User = Depends(current_active_user),
 ):
-    result = await session.execute(select(Post).order_by(Post.created_at.desc()))
-    posts = [row[0] for row in result.all()]
-
-    result = await session.execute(select(User))
-    users = [row[0] for row in result.all()]
-    user_dict = {u.id: u.email for u in users}
+    result = await session.execute(
+        select(Post, User)
+        .join(User, Post.user_id == User.id)
+        .order_by(Post.created_at.desc())
+    )
 
     posts_data = []
-    for post in posts:
+    for post, post_user in result.all():
         posts_data.append(
             {
                 "id": str(post.id),
@@ -111,11 +110,12 @@ async def get_feed(
                 "file_name": post.file_name,
                 "created_at": post.created_at.isoformat(),
                 "is_owner": post.user_id == user.id,
-                "email": post.user.email,
+                "email": post_user.email,
             }
         )
 
     return {"posts": posts_data}
+
 
 
 @app.delete("/posts/{post_id}")
